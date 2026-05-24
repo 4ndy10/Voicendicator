@@ -1,0 +1,174 @@
+/* ================================================================
+   MÓDULO: variables.css — Design Tokens del Sistema de Diseño
+   
+   Contiene TODAS las custom properties (CSS variables) que definen
+   la identidad visual de Voicendicator. Cualquier cambio de color,
+   tipografía o espaciado debe hacerse AQUÍ para mantener consistencia.
+   
+   PALETA PRINCIPAL:
+   - Crema  #FDF8F0  → Fondo principal (cálido, legible)
+   - Verde  #1b7d18  → Acento primario (acción, éxito, micrófono)
+   - Azul   #09249c  → Acento secundario (datos, títulos, contraste)
+   
+   ESTILO: Soft Neumorphism + Flat Design híbrido
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   IMPORTACIÓN DE FUENTES — Google Fonts
+   
+   - Montserrat: Fuente de encabezados. Geométrica, moderna y legible.
+     Se cargan pesos 300-800 + itálica para máxima flexibilidad.
+   - Open Sans: Fuente de cuerpo. Humanista, excelente para lectura
+     prolongada en pantalla. Pesos 300-700.
+   ══════════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Open+Sans:wght@300;400;500;600;700&display=swap');
+
+/* ══════════════════════════════════════════════════════════════════
+   CUSTOM PROPERTIES — Variables CSS globales
+   
+   Todas las variables se definen en :root para que estén disponibles
+   en cualquier parte del DOM. Están organizadas por categoría.
+   ══════════════════════════════════════════════════════════════════ */
+:root {
+
+  /* ── Colores de fondo ──
+     Tres niveles de profundidad para crear jerarquía visual:
+     primary  → fondo general de la página
+     secondary → cards, paneles, elementos elevados
+     tertiary  → fondos de hover o estados inactivos
+     dark      → área de captura de audio/video (contraste alto) */
+  --color-bg-primary: #FDF8F0;
+  --color-bg-secondary: #F5EFE4;
+  --color-bg-tertiary: #EDE6D8;
+  --color-bg-dark: #1a1a2e;
+
+  /* ── Colores de acento: Verde ──
+     El verde representa acción, actividad y el micrófono.
+     Se usa en botones primarios, indicadores activos y gráficos F₀.
+     - green       → tono base
+     - green-light → hover/activo
+     - green-glow  → sombra luminosa (box-shadow)
+     - green-subtle → fondos tenues para badges y banners */
+  --color-accent-green: #1b7d18;
+  --color-accent-green-light: #25a321;
+  --color-accent-green-glow: rgba(27, 125, 24, 0.18);
+  --color-accent-green-subtle: rgba(27, 125, 24, 0.08);
+
+  /* ── Colores de acento: Azul ──
+     El azul representa datos, información y estructura.
+     Se usa en títulos, valores numéricos y elementos de UI pasivos.
+     - blue       → tono base
+     - blue-light → hover
+     - blue-subtle → fondos tenues */
+  --color-accent-blue: #09249c;
+  --color-accent-blue-light: #1636c5;
+  --color-accent-blue-subtle: rgba(9, 36, 156, 0.06);
+
+  /* ── Colores de texto ──
+     Tres niveles de contraste para jerarquía tipográfica:
+     primary   → títulos y texto principal (casi negro)
+     secondary → texto descriptivo (gris oscuro)
+     muted     → labels, captions, texto auxiliar (gris medio) */
+  --color-text-primary: #1a1a2e;
+  --color-text-secondary: #4a4a5a;
+  --color-text-muted: #8a8a9a;
+
+  /* ── Color blanco puro ── */
+  --color-white: #ffffff;
+
+  /* ── Bordes ──
+     Dos niveles de opacidad para separadores sutiles:
+     border       → separación suave entre secciones
+     border-strong → separación más visible (hover, focus) */
+  --color-border: rgba(9, 36, 156, 0.1);
+  --color-border-strong: rgba(9, 36, 156, 0.2);
+
+  /* ── Sombras (Soft Neumorphism) ──
+     El neumorfismo suave combina una sombra oscura (abajo-derecha)
+     con una sombra clara (arriba-izquierda) para simular profundidad
+     sobre el fondo crema. Cada nivel incrementa la intensidad.
+     
+     soft     → elementos base (meters, cards)
+     medium   → hover sobre elementos
+     elevated → panel principal, máxima prominencia
+     inset    → campos de entrada, tracks de barras (hundido)
+     
+     Los glows de color se usan en botones y elementos interactivos. */
+  --shadow-soft: 
+    6px 6px 16px rgba(0, 0, 0, 0.06),
+    -4px -4px 12px rgba(255, 255, 255, 0.8);
+  --shadow-medium: 
+    8px 8px 24px rgba(0, 0, 0, 0.08),
+    -6px -6px 16px rgba(255, 255, 255, 0.9);
+  --shadow-elevated: 
+    12px 12px 32px rgba(0, 0, 0, 0.1),
+    -8px -8px 24px rgba(255, 255, 255, 0.95);
+  --shadow-inset: 
+    inset 4px 4px 10px rgba(0, 0, 0, 0.06),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.7);
+  --shadow-green-glow: 0 4px 20px rgba(27, 125, 24, 0.25);
+  --shadow-blue-glow: 0 4px 20px rgba(9, 36, 156, 0.2);
+
+  /* ── Tipografía ──
+     Escala tipográfica modular de xs (0.75rem / 12px) a 4xl (2.75rem / 44px).
+     Se usa clamp() en los componentes para tamaños fluidos. */
+  --font-heading: 'Montserrat', sans-serif;
+  --font-body: 'Open Sans', sans-serif;
+  --font-size-xs: 0.75rem;    /* 12px — captions, axis labels */
+  --font-size-sm: 0.875rem;   /* 14px — labels, descriptions */
+  --font-size-base: 1rem;     /* 16px — texto body */
+  --font-size-md: 1.125rem;   /* 18px — texto destacado */
+  --font-size-lg: 1.25rem;    /* 20px — subtítulos */
+  --font-size-xl: 1.5rem;     /* 24px — títulos de sección */
+  --font-size-2xl: 1.875rem;  /* 30px — título principal (móvil) */
+  --font-size-3xl: 2.25rem;   /* 36px — valores grandes (Hz) */
+  --font-size-4xl: 2.75rem;   /* 44px — título principal (desktop) */
+
+  /* ── Espaciado ──
+     Escala de espaciado consistente basada en rem.
+     Cada nivel duplica aproximadamente al anterior.
+     Se usa para padding, margin, gap en toda la app. */
+  --space-xs: 0.25rem;   /* 4px  */
+  --space-sm: 0.5rem;    /* 8px  */
+  --space-md: 1rem;      /* 16px */
+  --space-lg: 1.5rem;    /* 24px */
+  --space-xl: 2rem;      /* 32px */
+  --space-2xl: 3rem;     /* 48px */
+  --space-3xl: 4rem;     /* 64px */
+  --space-4xl: 6rem;     /* 96px */
+
+  /* ── Bordes redondeados ──
+     Escala de border-radius para diferentes contextos:
+     sm   → inputs, badges pequeños
+     md   → botones, cards pequeñas
+     lg   → panels, cards grandes
+     xl   → contenedores principales
+     full → círculos, pills */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ── Transiciones ──
+     Curvas de easing y duraciones para animaciones de UI.
+     - ease-out   → transiciones estándar (suave al final)
+     - ease-spring → efecto de rebote para transformaciones
+     - fast/normal/slow → tres velocidades para diferentes contextos */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+
+  /* ── Colores de tono vocal (dinámicos vía JS) ──
+     Azules para tonos masculinos, morados para femeninos,
+     verde para voz neutra/indeterminada.
+     JS cambia el fondo del body y el banner de resultado
+     usando estos colores según la clase ganadora del modelo. */
+  --tone-masc-grave: #0a1a4a;
+  --tone-masc-aguda: #5b8dee;
+  --tone-fem-grave: #3a0a5c;
+  --tone-fem-aguda: #b47ede;
+  --tone-neutral: #1b7d18;
+}

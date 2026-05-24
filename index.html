@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Voicendicator — Analiza tu tono de voz con Inteligencia Artificial. Descubre si tu voz es grave, aguda o neutra usando Machine Learning y frecuencias fundamentales (F₀)." />
+  <title>Voicendicator — Analizador de Tono de Voz con IA</title>
+  <link rel="icon" type="image/png" href="assets/logo-voicendicator.png" />
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       HOJAS DE ESTILO CSS — Organizadas por componente
+       
+       Orden de carga:
+       1. variables.css  → Design tokens (colores, fuentes, sombras, etc.)
+       2. base.css       → Reset, body, tipografía base, container
+       3. animations.css → Keyframes usados por otros componentes
+       4. header.css     → Encabezado: badge, título, subtítulo
+       5. main-panel.css → Panel principal: media area, controles, Hz
+       6. buttons.css    → Sistema de botones (.btn variantes)
+       7. results.css    → Meters, banner neutral, gráfico espectro
+       8. didactic.css   → Sección educativa "¿Sabías que...?"
+       9. footer.css     → Pie de página
+      10. responsive.css → Media queries para tablet y móvil
+       ═══════════════════════════════════════════════════════════════ -->
+  <link rel="stylesheet" href="css/variables.css" />
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/navbar.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+  <link rel="stylesheet" href="css/header.css" />
+  <link rel="stylesheet" href="css/main-panel.css" />
+  <link rel="stylesheet" href="css/buttons.css" />
+  <link rel="stylesheet" href="css/results.css" />
+  <link rel="stylesheet" href="css/didactic.css" />
+  <link rel="stylesheet" href="css/footer.css" />
+  <link rel="stylesheet" href="css/responsive.css" />
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       DEPENDENCIAS EXTERNAS: TensorFlow.js + Teachable Machine (Speech)
+       
+       Estas librerías se cargan desde CDN para GitHub Pages.
+       Son necesarias para la clasificación vocal con IA.
+       - tf.min.js → Motor de Machine Learning en el navegador
+       - speech-commands.min.js → API de comandos de voz de TM
+       ═══════════════════════════════════════════════════════════════ -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js"></script>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       NAVBAR — Barra de navegación superior
+       
+       Sticky, delgada, minimalista con glassmorphism.
+       Logo a la izquierda, botón "Reiniciar Modelo" a la derecha.
+       Estilos en css/navbar.css.
+       ════════════════════════════════════════════════════════════════ -->
+  <nav class="navbar" id="navbar">
+    <div class="container navbar__inner">
+      <a href="/" class="navbar__brand">
+        <img src="assets/logo-voicendicator.png" alt="Voicendicator" class="navbar__logo" />
+      </a>
+      <button class="navbar__btn-reset" id="btnReset" type="button" aria-label="Reiniciar modelo y recargar página">
+        ↻ Reiniciar Modelo
+      </button>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       HEADER — Encabezado principal
+       
+       Contiene el badge de la app, el título con gradiente
+       y el subtítulo descriptivo. Estilos en css/header.css.
+       ════════════════════════════════════════════════════════════════ -->
+  <header class="header" id="header">
+    <div class="container">
+      <!-- Título principal con gradiente en la segunda línea -->
+      <h1 class="header__title">
+        Analizador de Tono de Voz con IA:<br/>
+        <span>¿Cómo te escuchan los demás?</span>
+      </h1>
+
+      <!-- Subtítulo descriptivo -->
+      <p class="header__subtitle">
+        Descubre si tu voz tiende a ser grave, aguda o neutra usando Machine Learning
+      </p>
+    </div>
+  </header>
+
+  <main>
+    <!-- ══════════════════════════════════════════════════════════════
+         MAIN INTERACTION PANEL — Panel de captura y análisis
+         
+         Grid de 2 columnas:
+         - Izquierda: Área de captura con canvas de waveform
+         - Derecha: Controles (estado, botones, Hz readout)
+         
+         Estilos en css/main-panel.css y css/buttons.css.
+         ══════════════════════════════════════════════════════════════ -->
+    <section class="main-panel" id="main-panel" aria-label="Panel de captura y análisis de voz">
+      <div class="container">
+        <div class="main-panel__container">
+          <div class="main-panel__grid">
+
+            <!-- ══ Media Area — Visualización de audio ══ -->
+            <div class="media-area" id="mediaArea" role="region" aria-label="Área de Captura de Audio">
+              <!-- Ícono decorativo (micrófono) visible cuando está inactivo -->
+              <div class="media-area__icons" id="mediaIcons">
+                <!-- Ícono de micrófono -->
+                <svg class="media-area__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/>
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                  <line x1="12" y1="19" x2="12" y2="22"/>
+                </svg>
+
+              </div>
+              <span class="media-area__label" id="mediaLabel">Área de Captura de Audio</span>
+
+              <!-- Canvas de forma de onda (oculto hasta que se active) -->
+              <div class="media-area__canvas-wrapper">
+                <canvas id="waveformCanvas"></canvas>
+              </div>
+
+              <!-- Anillo de pulso animado (indicador de grabación) -->
+              <div class="media-area__pulse"></div>
+            </div>
+
+            <!-- ══ Controls Panel — Estado, botones, Hz ══ -->
+            <div class="controls" id="controlsPanel">
+              <!-- Indicador de estado (punto + texto) -->
+              <div class="controls__header">
+                <div class="controls__status-dot" id="statusDot"></div>
+                <span class="controls__status-text" id="statusText">Listo para analizar</span>
+              </div>
+
+              <!-- Descripción de uso -->
+              <p class="controls__description">
+                Presiona <strong>"Iniciar Análisis"</strong> para activar tu micrófono. La IA analizará la frecuencia fundamental (F₀) de tu voz en tiempo real y clasificará tu tono vocal.
+              </p>
+
+              <!-- Botones de acción -->
+              <div class="controls__buttons">
+                <button class="btn btn--primary" id="btnStart" type="button" aria-label="Iniciar análisis de voz">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                  </svg>
+                  Iniciar Análisis
+                </button>
+                <button class="btn btn--secondary" id="btnStop" type="button" disabled aria-label="Detener análisis">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="6" y="4" width="4" height="16"/>
+                    <rect x="14" y="4" width="4" height="16"/>
+                  </svg>
+                  Detener
+                </button>
+              </div>
+
+              <!-- Display de frecuencia fundamental -->
+              <div class="hz-readout" id="hzReadout">
+                <div class="hz-readout__label">Frecuencia Fundamental (F₀)</div>
+                <div class="hz-readout__value" id="hzValue">— <span>Hz</span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         RESULTS SECTION — Resultados del análisis
+         
+         Contiene:
+         - 4 meters de clasificación vocal (Masc/Fem × Grave/Agudo)
+         - Banner de voz neutra (aparece condicionalmente)
+         - Gráfico de espectro F₀ en tiempo real
+         
+         Estilos en css/results.css.
+         ══════════════════════════════════════════════════════════════ -->
+    <section class="results" id="results" aria-label="Resultados del análisis de voz">
+      <div class="container">
+        <!-- Título de sección con ícono de pulso -->
+        <h2 class="results__title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+          </svg>
+          Resultados de la Inferencia del Modelo
+        </h2>
+
+        <!-- ══ Panel de resultado de tono ══
+             Reemplaza el antiguo grid de 4 meters.
+             El banner muestra el tono detectado con color dinámico.
+             Las barras muestran las probabilidades reales del modelo. -->
+        <div class="tone-result" id="toneResult">
+          <!-- Banner con resultado del tono actual -->
+          <div class="tone-result__banner" id="toneBanner" role="status" aria-live="polite">
+            <span class="tone-result__icon" id="toneIcon">🎙️</span>
+            <span class="tone-result__label" id="toneLabel">Esperando audio...</span>
+          </div>
+
+          <!-- Barras con las probabilidades reales del modelo -->
+          <div class="tone-result__bars">
+            <!-- Barra: Masculino Grave -->
+            <div class="tone-bar">
+              <span class="tone-bar__label">Masculino Grave</span>
+              <div class="tone-bar__track">
+                <div class="tone-bar__fill tone-bar__fill--mg" id="bar-mg" style="width: 0%"></div>
+              </div>
+              <span class="tone-bar__value" id="val-mg">0%</span>
+            </div>
+            <!-- Barra: Masculino Agudo -->
+            <div class="tone-bar">
+              <span class="tone-bar__label">Masculino Agudo</span>
+              <div class="tone-bar__track">
+                <div class="tone-bar__fill tone-bar__fill--ma" id="bar-ma" style="width: 0%"></div>
+              </div>
+              <span class="tone-bar__value" id="val-ma">0%</span>
+            </div>
+            <!-- Barra: Femenino Grave -->
+            <div class="tone-bar">
+              <span class="tone-bar__label">Femenino Grave</span>
+              <div class="tone-bar__track">
+                <div class="tone-bar__fill tone-bar__fill--fg" id="bar-fg" style="width: 0%"></div>
+              </div>
+              <span class="tone-bar__value" id="val-fg">0%</span>
+            </div>
+            <!-- Barra: Femenino Agudo -->
+            <div class="tone-bar">
+              <span class="tone-bar__label">Femenino Agudo</span>
+              <div class="tone-bar__track">
+                <div class="tone-bar__fill tone-bar__fill--fa" id="bar-fa" style="width: 0%"></div>
+              </div>
+              <span class="tone-bar__value" id="val-fa">0%</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ Indicador de Ruido de Fondo ══
+             Muestra el porcentaje de ruido de fondo detectado por
+             el modelo (clase [0]). Separado de las barras vocales. -->
+        <div class="noise-indicator" id="noiseIndicator">
+          <div class="noise-indicator__header">
+            <svg class="noise-indicator__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+              <line x1="1" y1="1" x2="23" y2="23" stroke-width="2"/>
+            </svg>
+            <span class="noise-indicator__title">Ruido de Fondo</span>
+          </div>
+          <div class="noise-indicator__body">
+            <div class="noise-indicator__track">
+              <div class="noise-indicator__fill" id="bar-noise" style="width: 0%"></div>
+            </div>
+            <span class="noise-indicator__value" id="val-noise">0%</span>
+          </div>
+        </div>
+
+        <!-- Gráfico de espectro de frecuencias en tiempo real -->
+        <div class="spectrum-chart" id="spectrumChart" aria-label="Gráfico del espectro de frecuencias en tiempo real">
+          <div class="spectrum-chart__header">
+            <div class="spectrum-chart__title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Espectro de Frecuencias (Hz) — Tiempo Real
+            </div>
+            <div class="spectrum-chart__legend">
+              <span><span class="spectrum-chart__legend-dot" style="background: #1b7d18;"></span>F₀ actual</span>
+              <span><span class="spectrum-chart__legend-dot" style="background: #09249c;"></span>Promedio</span>
+            </div>
+          </div>
+          <div class="spectrum-chart__canvas-wrapper">
+            <canvas id="spectrumCanvas"></canvas>
+          </div>
+          <div class="spectrum-chart__axes">
+            <span class="spectrum-chart__axis-label">Tiempo →</span>
+            <span class="spectrum-chart__axis-label">Frecuencia (Hz) ↑</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════════════════════════
+         DIDACTIC SECTION — Información educativa
+         
+         Explica al usuario por qué percibe su propia voz de forma
+         diferente a como la escuchan los demás (conducción ósea).
+         
+         Estilos en css/didactic.css.
+         ══════════════════════════════════════════════════════════════ -->
+    <section class="didactic" id="didactic" aria-label="Información didáctica sobre la voz">
+      <div class="container">
+        <div class="didactic__card">
+          <div class="didactic__icon-wrapper">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+              <line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </div>
+          <h2 class="didactic__title">¿Sabías que...?</h2>
+          <p class="didactic__text">
+            Escuchas tu propia voz más grave de lo que realmente es, debido a la <em>conducción ósea</em> a través de tu cráneo. Los huesos de tu cabeza transmiten las frecuencias bajas de forma más eficiente, lo que distorsiona tu percepción. Esta herramienta usa la <span class="didactic__formula">F₀</span> (frecuencia fundamental) para darte una <em>perspectiva objetiva</em> y científica de cómo suena tu voz para los demás.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ══════════════════════════════════════════════════════════════
+       FOOTER — Pie de página
+       
+       Créditos del proyecto y enlaces a tecnologías usadas.
+       Estilos en css/footer.css.
+       ══════════════════════════════════════════════════════════════ -->
+  <footer class="footer" id="footer">
+    <div class="container">
+      <!-- Mini logo en el footer -->
+      <img 
+        src="assets/logo-voicendicator.png" 
+        alt="Voicendicator" 
+        class="footer__logo"
+      />
+      <p class="footer__text">
+        Proyecto Final de Big Data &nbsp;|&nbsp; Desarrollado con
+        <a href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener noreferrer">Teachable Machine</a>
+        y
+        <a href="https://www.tensorflow.org/js" target="_blank" rel="noopener noreferrer">TensorFlow.js</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════════════════════
+       MÓDULOS JAVASCRIPT — Organizados por responsabilidad
+       
+       ORDEN DE CARGA (¡IMPORTANTE! Las dependencias van primero):
+       
+        1. config.js   → Namespace global + constantes + estado
+        2. dom.js      → Referencias DOM centralizadas
+        3. canvas.js   → Inicialización de canvas HTML5
+        4. waveform.js → Visualización de forma de onda
+        5. pitch.js    → Detección de F₀ por autocorrelación
+        6. spectrum.js → Gráfico de espectro de frecuencias
+        7. meters.js   → Barras de clasificación vocal
+        8. ui.js       → Gestión de estado visual
+        9. model.js    → TensorFlow.js / Teachable Machine (preparado)
+       10. recorder.js → Control de micrófono + loop de análisis
+       11. app.js      → Event listeners + inicialización (ÚLTIMO)
+       ═══════════════════════════════════════════════════════════════ -->
+  <script src="js/config.js"></script>
+  <script src="js/dom.js"></script>
+  <script src="js/canvas.js"></script>
+  <script src="js/waveform.js"></script>
+  <script src="js/pitch.js"></script>
+  <script src="js/spectrum.js"></script>
+  <script src="js/meters.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/model.js"></script>
+  <script src="js/recorder.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

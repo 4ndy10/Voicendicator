@@ -1,0 +1,370 @@
+/* ================================================================
+   MÓDULO: results.css — Sección de Resultados del Análisis
+   
+   Contiene los estilos de tres sub-componentes:
+   
+   1. METERS: Grid de 4 barras de progreso que muestran la
+      probabilidad de cada categoría vocal:
+      - Masculino Grave (mg)
+      - Masculino Agudo (ma)
+      - Femenino Grave (fg)
+      - Femenino Agudo (fa)
+   
+   2. NEUTRAL BANNER: Banner que aparece cuando la voz se clasifica
+      como "neutra" (diferencia < 20% entre categorías).
+   
+   3. SPECTRUM CHART: Gráfico de línea en tiempo real que muestra
+      la frecuencia fundamental (F₀) y su promedio en el tiempo.
+   
+   DEPENDENCIAS: variables.css, animations.css
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   RESULTS — Sección contenedora de resultados
+   
+   Margen vertical grande y animación de entrada escalonada
+   (delay 0.4s, después del main panel).
+   ══════════════════════════════════════════════════════════════════ */
+.results {
+  margin: var(--space-3xl) 0;
+  animation: fadeInUp 0.7s var(--ease-out) 0.4s both;
+}
+
+/* Título de sección con ícono SVG (pulso cardíaco) */
+.results__title {
+  font-size: var(--font-size-xl);
+  color: var(--color-accent-blue);
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+/* Ícono del título — verde para contrastar con el texto azul */
+.results__title svg {
+  width: 24px;
+  height: 24px;
+  color: var(--color-accent-green);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TONE RESULT — Panel de resultado de tono vocal
+   
+   Reemplaza el antiguo grid de 4 meters. Contiene:
+   - Banner con el tono detectado (texto + color dinámico)
+   - 4 barras de probabilidad (una por clase del modelo)
+   
+   El color del banner y del fondo se controlan vía JS según
+   la clase ganadora del modelo de Teachable Machine.
+   ══════════════════════════════════════════════════════════════════ */
+.tone-result {
+  margin-bottom: var(--space-2xl);
+}
+
+/* ── Banner de resultado de tono ──
+   Muestra el tono detectado con color dinámico.
+   Fondo, color de texto y sombra se cambian vía JS. */
+.tone-result__banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xl) var(--space-2xl);
+  border-radius: var(--radius-xl);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+  margin-bottom: var(--space-xl);
+  transition: background-color 0.5s ease,
+              color 0.3s ease,
+              border-color 0.4s ease,
+              box-shadow 0.4s ease,
+              transform var(--duration-normal) var(--ease-out);
+}
+
+/* Hover sutil para darle vida */
+.tone-result__banner:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Ícono del banner (emoji o SVG) */
+.tone-result__icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+/* Texto del tono detectado */
+.tone-result__label {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--font-size-lg), 3vw, var(--font-size-xl));
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: color 0.3s ease;
+}
+
+/* Estado activo del banner — cuando hay un tono detectado */
+.tone-result__banner--active {
+  border-color: transparent;
+}
+
+/* ── Grid de barras de probabilidad ──
+   2 columnas en desktop para agrupar Masculinas | Femeninas.
+   Cada barra muestra el % real del modelo. */
+.tone-result__bars {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ── Barra individual de probabilidad ── */
+.tone-bar {
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-border);
+  transition: box-shadow var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out);
+}
+
+.tone-bar:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+/* Label de la barra — nombre de la clase del modelo */
+.tone-bar__label {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-sm);
+  display: block;
+}
+
+/* Track de la barra — fondo hundido */
+.tone-bar__track {
+  width: 100%;
+  height: 10px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  box-shadow: var(--shadow-inset);
+  margin-bottom: var(--space-sm);
+}
+
+/* Fill de la barra — gradiente por tipo */
+.tone-bar__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  width: 0%;
+  transition: width 0.6s var(--ease-spring);
+}
+
+/* Gradientes específicos por categoría vocal */
+.tone-bar__fill--mg {
+  background: linear-gradient(90deg, var(--tone-masc-grave), #1a3a7a);
+}
+.tone-bar__fill--ma {
+  background: linear-gradient(90deg, #3a6ad4, var(--tone-masc-aguda));
+}
+.tone-bar__fill--fg {
+  background: linear-gradient(90deg, var(--tone-fem-grave), #6a2a9a);
+}
+.tone-bar__fill--fa {
+  background: linear-gradient(90deg, #9a5cc8, var(--tone-fem-aguda));
+}
+
+/* Valor porcentual */
+.tone-bar__value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  transition: color 0.3s ease;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   NOISE INDICATOR — Indicador de Ruido de Fondo
+   
+   Muestra el porcentaje de ruido de fondo (clase [0] del modelo).
+   Visualmente separado de las barras vocales, usa el fondo beige
+   de la página para diferenciarse.
+   ══════════════════════════════════════════════════════════════════ */
+.noise-indicator {
+  margin-top: var(--space-xl);
+  background: var(--color-bg-primary);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg) var(--space-xl);
+  transition: box-shadow var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out);
+}
+
+.noise-indicator:hover {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+/* Header — ícono + título */
+.noise-indicator__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.noise-indicator__icon {
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.noise-indicator__title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Body — barra + valor */
+.noise-indicator__body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+/* Track de la barra */
+.noise-indicator__track {
+  flex: 1;
+  height: 8px;
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  box-shadow: var(--shadow-inset);
+}
+
+/* Fill — gradiente gris/marrón para ruido */
+.noise-indicator__fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  width: 0%;
+  background: linear-gradient(90deg, #9a9a9a, #6a6a6a);
+  transition: width 0.6s var(--ease-spring);
+}
+
+/* Valor porcentual */
+.noise-indicator__value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  min-width: 3em;
+  text-align: right;
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   SPECTRUM CHART — Gráfico de Frecuencias en Tiempo Real
+   
+   Card neumórfica que contiene:
+   - Header: título con ícono + leyenda (F₀ actual / Promedio)
+   - Canvas wrapper: contenedor del canvas de espectro (200px alto)
+   - Axes: etiquetas de ejes (Tiempo → / Frecuencia Hz ↑)
+   ══════════════════════════════════════════════════════════════════ */
+.spectrum-chart {
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-border);
+  padding: var(--space-xl);
+}
+
+/* Header del gráfico — título a la izquierda, leyenda a la derecha */
+.spectrum-chart__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+/* Título con ícono de actividad (ECG) */
+.spectrum-chart__title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-accent-blue);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.spectrum-chart__title svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* ── Leyenda del gráfico ──
+   Puntos de color + texto para identificar las líneas del gráfico:
+   - Verde: F₀ actual (frecuencia en tiempo real)
+   - Azul: Promedio acumulado */
+.spectrum-chart__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Punto circular de color de la leyenda */
+.spectrum-chart__legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: var(--space-xs);
+}
+
+/* ── Canvas Wrapper ──
+   Contenedor del canvas con fondo crema oscuro y sombra inset.
+   Altura fija de 200px para consistencia visual. */
+.spectrum-chart__canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  box-shadow: var(--shadow-inset);
+}
+
+/* El canvas ocupa todo el espacio del wrapper */
+#spectrumCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Etiquetas de ejes ──
+   Posicionadas debajo del canvas, una a cada lado */
+.spectrum-chart__axes {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-sm);
+  padding: 0 var(--space-sm);
+}
+
+/* Estilo de cada etiqueta de eje */
+.spectrum-chart__axis-label {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent-blue);
+  font-weight: 500;
+  opacity: 0.7;
+}

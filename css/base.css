@@ -1,0 +1,117 @@
+/* ================================================================
+   MÓDULO: base.css — Reset, Estilos Base y Layout
+   
+   Establece la base visual de toda la aplicación:
+   - Reset CSS universal para eliminar estilos por defecto del navegador
+   - Configuración del body (fuente, color, fondo)
+   - Textura decorativa de fondo con gradientes radiales
+   - Reglas tipográficas globales para encabezados y párrafos
+   - Clase .container para centrar y limitar el ancho del contenido
+   
+   DEPENDENCIAS: variables.css (debe cargarse antes)
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   RESET CSS UNIVERSAL
+   
+   Elimina márgenes, paddings y establece box-sizing: border-box
+   en TODOS los elementos, incluyendo pseudo-elementos.
+   Esto evita sorpresas con el modelo de caja del navegador.
+   ══════════════════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HTML — Configuración global del documento
+   
+   - scroll-behavior: smooth → scroll suave al hacer clic en anclas
+   - font-smoothing → renderizado tipográfico más nítido en macOS/iOS
+   ══════════════════════════════════════════════════════════════════ */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BODY — Estilos base del documento
+   
+   - Fuente Open Sans para texto de cuerpo (legibilidad)
+   - Fondo crema (#FDF8F0) para un tono cálido y profesional
+   - Line-height 1.65 para buena legibilidad en párrafos
+   - overflow-x: hidden para prevenir scroll horizontal accidental
+   ══════════════════════════════════════════════════════════════════ */
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: 1.65;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.4s ease;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TEXTURA DE FONDO DECORATIVA
+   
+   Dos gradientes radiales semitransparentes (verde y azul) fijos
+   en la pantalla. Crean un efecto sutil de iluminación ambiental
+   sin interferir con el contenido (pointer-events: none).
+   
+   - Verde arriba-izquierda → asociado al micrófono/acción
+   - Azul abajo-derecha → asociado a datos/análisis
+   ══════════════════════════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(27, 125, 24, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(9, 36, 156, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TIPOGRAFÍA BASE — Encabezados y párrafos
+   
+   Los encabezados usan Montserrat (geométrica, impactante).
+   - font-weight: 700 → negrita para todos los niveles
+   - line-height: 1.2 → más compacto que el texto body
+   - letter-spacing negativo → reduce el espaciado para tamaños grandes
+   
+   Los párrafos tienen max-width: 65ch para una longitud de línea
+   óptima para lectura (~65 caracteres por línea).
+   ══════════════════════════════════════════════════════════════════ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+p {
+  max-width: 65ch;
+  line-height: 1.7;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CONTAINER — Contenedor de layout principal
+   
+   Centra el contenido horizontalmente con un ancho máximo de 1200px.
+   El padding lateral (var(--space-xl) = 32px) da respiro en pantallas
+   pequeñas. z-index: 1 asegura que el contenido esté por encima
+   de la textura de fondo (z-index: 0).
+   ══════════════════════════════════════════════════════════════════ */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+  position: relative;
+  z-index: 1;
+}

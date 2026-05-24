@@ -1,0 +1,154 @@
+/* ================================================================
+   MÓDULO: buttons.css — Sistema de Botones
+   
+   Define los estilos de todos los botones de la aplicación:
+   
+   - .btn         → Estilos base compartidos por todos los botones
+   - .btn--primary   → Botón verde "Iniciar Análisis" (acción principal)
+   - .btn--secondary → Botón azul "Detener" (acción secundaria)
+   
+   Cada variante tiene estados: default, :hover, :active, :disabled.
+   Los botones incluyen un pseudo-elemento ::after para efecto de
+   "flash" al hacer clic (:active).
+   
+   DEPENDENCIAS: variables.css
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   BTN BASE — Estilos compartidos por todos los botones
+   
+   - Flexbox inline para alinear ícono SVG + texto
+   - Montserrat bold con letter-spacing para estilo de UI
+   - Min-height 52px para targets táctiles accesibles (WCAG)
+   - overflow: hidden para contener el efecto ::after
+   ══════════════════════════════════════════════════════════════════ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  border: 2px solid transparent;
+  min-height: 52px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Efecto "flash" al hacer clic — capa blanca semitransparente
+   que aparece instantáneamente y se desvanece con :active.
+   Da feedback táctil visual al usuario. */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.15);
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+
+.btn:active::after {
+  opacity: 1;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BTN PRIMARY — Botón de acción principal (verde)
+   
+   Fondo verde sólido con texto blanco.
+   Sombra luminosa verde (green-glow) para destacar como CTA.
+   En hover: color más claro, sombra más intensa, sube 2px.
+   En active: regresa a posición original.
+   En disabled: opacidad reducida, cursor no-allowed.
+   ══════════════════════════════════════════════════════════════════ */
+.btn--primary {
+  background: var(--color-accent-green);
+  color: var(--color-white);
+  box-shadow: var(--shadow-green-glow);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Hover: verde más claro + sombra ampliada + elevación de 2px */
+.btn--primary:hover {
+  background: var(--color-accent-green-light);
+  box-shadow: 0 6px 28px rgba(27, 125, 24, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Active: regresa a posición base, sombra normal */
+.btn--primary:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-green-glow);
+}
+
+/* Disabled: reducción de opacidad, sin transformaciones ni sombras */
+.btn--primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BTN SECONDARY — Botón de acción secundaria (azul, outline)
+   
+   Fondo transparente con borde azul.
+   Más sutil que el primario para indicar acción menos prioritaria.
+   En hover: fondo azul muy sutil + sombra azul.
+   ══════════════════════════════════════════════════════════════════ */
+.btn--secondary {
+  background: transparent;
+  color: var(--color-accent-blue);
+  border-color: var(--color-accent-blue);
+}
+
+/* Hover: fondo azul tenue + sombra luminosa azul + elevación */
+.btn--secondary:hover {
+  background: var(--color-accent-blue-subtle);
+  box-shadow: var(--shadow-blue-glow);
+  transform: translateY(-2px);
+}
+
+/* Active: regresa a posición base */
+.btn--secondary:active {
+  transform: translateY(0);
+}
+
+/* Disabled: opacidad más baja que primary (0.4 vs 0.5) */
+.btn--secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ÍCONO SVG DENTRO DE BOTONES
+   
+   Tamaño fijo 20x20px. flex-shrink: 0 evita que el ícono
+   se comprima cuando el texto es largo.
+   ══════════════════════════════════════════════════════════════════ */
+.btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CONTROLS BUTTONS — Layout del grupo de botones
+   
+   Columna vertical con gap entre botones en desktop.
+   Se convierte en fila en tablet y vuelve a columna en móvil
+   (ver responsive.css).
+   ══════════════════════════════════════════════════════════════════ */
+.controls__buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}

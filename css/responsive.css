@@ -1,0 +1,137 @@
+/* ================================================================
+   MÓDULO: responsive.css — Media Queries Responsivas
+   
+   Contiene TODAS las adaptaciones para pantallas más pequeñas.
+   Organizado de mayor a menor breakpoint:
+   
+   1. ≤ 1024px (Tablet landscape) — Grid de 1 columna
+   2. ≤ 768px  (Tablet portrait)  — Padding reducido, botones en fila
+   3. ≤ 480px  (Móvil)            — Barras en 1 columna, botones verticales
+   
+   ESTRATEGIA: Mobile-last (desktop-first). Los estilos base están
+   diseñados para desktop y se adaptan hacia abajo con max-width.
+   
+   DEPENDENCIAS: variables.css + todos los módulos CSS de componentes
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   BREAKPOINT: ≤ 1024px — Tablet Landscape
+   
+   Cambios principales:
+   - El grid del main panel pasa de 2 columnas a 1 columna.
+     Esto apila el media area encima de los controles.
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+
+  /* Main panel: de 2 columnas a 1 columna */
+  .main-panel__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BREAKPOINT: ≤ 768px — Tablet Portrait
+   
+   Cambios principales:
+   - Padding del container reducido (xl → md, 32px → 16px)
+   - Padding del main panel reducido (2xl → lg, 48px → 24px)
+   - Título más pequeño (tamaño fijo 2xl en vez de clamp)
+   - Tone bars con gap más pequeño
+   - Botones en fila horizontal (cada uno flex: 1)
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Container: padding lateral reducido para aprovechar espacio */
+  .container {
+    padding: 0 var(--space-md);
+  }
+
+  /* Main panel: padding interno reducido */
+  .main-panel__container {
+    padding: var(--space-lg);
+  }
+
+  /* Logo: tamaño reducido para tablet */
+  .header__logo {
+    width: clamp(180px, 35vw, 260px);
+  }
+
+  /* Título: tamaño fijo más pequeño (sin clamp) */
+  .header__title {
+    font-size: var(--font-size-2xl);
+  }
+
+  /* Tone bars: gap reducido */
+  .tone-result__bars {
+    gap: var(--space-md);
+  }
+
+  /* Banner de tono: padding reducido */
+  .tone-result__banner {
+    padding: var(--space-lg) var(--space-xl);
+  }
+
+  /* Botones: cambian de columna a fila horizontal.
+     Cada botón ocupa espacio igual (flex: 1) */
+  .controls__buttons {
+    flex-direction: row;
+  }
+
+  .controls__buttons .btn {
+    flex: 1;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   BREAKPOINT: ≤ 480px — Móvil
+   
+   Cambios principales:
+   - Tone bars: 1 sola columna (apilados verticalmente)
+   - Header: padding reducido
+   - Didactic card: padding reducido
+   - Botones: regresan a columna vertical (más cómodo en móvil)
+   ══════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+
+  /* Tone bars: 1 columna para que cada barra tenga ancho completo */
+  .tone-result__bars {
+    grid-template-columns: 1fr;
+  }
+
+  /* Header: padding vertical reducido para ahorrar espacio */
+  .header {
+    padding: var(--space-xl) 0 var(--space-lg);
+  }
+
+  /* Logo: tamaño compacto para móvil */
+  .header__logo {
+    width: clamp(160px, 50vw, 220px);
+  }
+
+  /* Footer logo: ligeramente más pequeño en móvil */
+  .footer__logo {
+    width: 40px;
+  }
+
+  /* Didactic card: padding interno reducido */
+  .didactic__card {
+    padding: var(--space-lg);
+  }
+
+  /* Botones: regresan a columna vertical.
+     En pantallas tan pequeñas, los botones en fila serían
+     demasiado estrechos para el texto + ícono. */
+  .controls__buttons {
+    flex-direction: column;
+  }
+
+  /* Tone banner: más compacto en móvil */
+  .tone-result__banner {
+    padding: var(--space-md) var(--space-lg);
+    gap: var(--space-sm);
+  }
+
+  .tone-result__icon {
+    font-size: 1.5rem;
+  }
+}

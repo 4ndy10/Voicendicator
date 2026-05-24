@@ -1,0 +1,134 @@
+/* ================================================================
+   MÓDULO: animations.css — Keyframes y Preferencias de Movimiento
+   
+   Contiene TODAS las animaciones @keyframes usadas en la app:
+   
+   1. fadeInDown   — Entrada desde arriba (header elements)
+   2. fadeInUp     — Entrada desde abajo (main panel, results, didactic)
+   3. pulseRing    — Anillo de pulso expandiéndose (media area activa)
+   4. blink        — Parpadeo del punto de estado (recording indicator)
+   5. shimmerGradient — Gradiente animado horizontalmente (didactic bar)
+   6. floatY       — Flotación vertical suave (decorativo, no asignado)
+   
+   También incluye la media query prefers-reduced-motion para
+   respetar las preferencias de accesibilidad del usuario.
+   
+   DEPENDENCIAS: Ninguna (se usa desde otros módulos CSS)
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   fadeInDown — Animación de entrada desde arriba
+   
+   El elemento empieza 20px arriba y transparente,
+   se desliza a su posición final con opacidad completa.
+   Usado en: header badge (0s), título (0.1s), subtítulo (0.2s).
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   fadeInUp — Animación de entrada desde abajo
+   
+   Similar a fadeInDown pero desde 30px abajo.
+   Desplazamiento mayor (30px vs 20px) porque los elementos
+   inferiores necesitan más movimiento para llamar la atención.
+   Usado en: main panel (0.3s), results (0.4s), didactic (0.5s).
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   pulseRing — Anillo de pulso expandible
+   
+   Un círculo que comienza a 80px y se expande a 200px
+   mientras se desvanece (opacity 0.6 → 0).
+   Simula una onda de radio emanando del centro del media area.
+   Loop infinito cada 2 segundos mientras se está grabando.
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes pulseRing {
+  0% {
+    width: 80px;
+    height: 80px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   blink — Parpadeo del indicador de estado
+   
+   Efecto de parpadeo suave para el punto verde de "grabando".
+   Alterna entre opacidad completa y 0.3 cada 1.2 segundos.
+   El 50% (no 0%) como punto bajo evita que el punto desaparezca
+   completamente, manteniendo siempre visibilidad parcial.
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   shimmerGradient — Gradiente animado horizontal
+   
+   Desplaza un gradiente de 200% de ancho a través de un elemento.
+   Crea un efecto de "brillo" que recorre la barra decorativa
+   de la sección didáctica. Loop infinito cada 4 segundos.
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes shimmerGradient {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   floatY — Flotación vertical suave
+   
+   Movimiento sutil de 6px arriba y abajo.
+   Actualmente definido pero no asignado a ningún elemento.
+   Disponible para uso futuro en elementos decorativos.
+   ══════════════════════════════════════════════════════════════════ */
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   PREFERENCIAS DE MOVIMIENTO REDUCIDO — Accesibilidad
+   
+   Si el usuario tiene activada la opción "Reducir movimiento"
+   en su sistema operativo, TODAS las animaciones y transiciones
+   se ejecutan instantáneamente (0.01ms).
+   
+   Esto respeta las preferencias de usuarios con:
+   - Trastornos vestibulares
+   - Epilepsia fotosensible
+   - Preferencia personal de menos movimiento
+   
+   Referencia: WCAG 2.1 Criterion 2.3.3 (Animation from Interactions)
+   ══════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

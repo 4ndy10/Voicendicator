@@ -1,0 +1,271 @@
+/* ================================================================
+   MÓDULO: main-panel.css — Panel Principal de Interacción
+   
+   Este es el componente central de la aplicación. Contiene:
+   
+   1. MEDIA AREA: Zona oscura donde se visualiza la forma de onda
+      del micrófono en tiempo real (canvas waveform).
+   2. CONTROLS: Panel lateral con estado, descripción, botones
+      de inicio/detención y lectura de Hz.
+   
+   Layout: Grid de 2 columnas (media | controls) en desktop,
+   se colapsa a 1 columna en tablet (ver responsive.css).
+   
+   DEPENDENCIAS: variables.css, animations.css
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   MAIN PANEL — Sección contenedora
+   
+   Margen vertical generoso (3xl = 64px) para separación visual.
+   Animación de entrada fadeInUp con delay 0.3s (aparece después
+   del header).
+   ══════════════════════════════════════════════════════════════════ */
+.main-panel {
+  margin: var(--space-3xl) 0;
+  animation: fadeInUp 0.7s var(--ease-out) 0.3s both;
+}
+
+/* Contenedor interno con estilo neumórfico elevado.
+   Border radius grande (xl = 24px) para aspecto moderno.
+   El borde sutil azul (10% opacidad) define los límites sin
+   ser agresivo visualmente. */
+.main-panel__container {
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-elevated);
+  padding: var(--space-2xl);
+  border: 1px solid var(--color-border);
+}
+
+/* Grid de 2 columnas para desktop.
+   Gap de 2xl (48px) da espacio entre media area y controles.
+   align-items: start evita que los controles se estiren
+   verticalmente para igualar la altura del media area. */
+.main-panel__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2xl);
+  align-items: start;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   MEDIA AREA — Zona de Captura de Audio/Video
+   
+   Área oscura (#1a1a2e) con borde verde que simula una ventana
+   de visualización. Contiene:
+   - Íconos decorativos de micrófono y cámara (estado inactivo)
+   - Label descriptivo
+   - Canvas de forma de onda (aparece cuando está activo)
+   - Anillo de pulso animado (indicador de grabación)
+   
+   Aspect ratio 16:10 para mantener proporción consistente.
+   ══════════════════════════════════════════════════════════════════ */
+.media-area {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid var(--color-accent-green);
+  background: var(--color-bg-dark);
+  aspect-ratio: 16 / 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  box-shadow: var(--shadow-inset);
+  transition: border-color var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+/* Estado activo: borde más brillante + sombra verde luminosa.
+   Se activa cuando el micrófono está grabando. */
+.media-area--active {
+  border-color: var(--color-accent-green-light);
+  box-shadow: var(--shadow-inset), 0 0 30px rgba(27, 125, 24, 0.15);
+}
+
+/* ── Íconos decorativos (micrófono + cámara) ──
+   Visibles por defecto con opacidad baja (0.5).
+   Se atenúan más (0.2) cuando la grabación está activa
+   para no interferir con la visualización del waveform. */
+.media-area__icons {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  opacity: 0.5;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.media-area--active .media-area__icons {
+  opacity: 0.2;
+}
+
+/* Cada ícono SVG tiene 48x48px en color verde */
+.media-area__icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-accent-green);
+}
+
+/* ── Label del área ──
+   Texto descriptivo debajo de los íconos.
+   Uppercase, spacing amplio para estilo de UI técnica. */
+.media-area__label {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+}
+
+/* ── Canvas Wrapper ──
+   Contenedor absoluto del canvas de waveform.
+   Invisible por defecto (opacity: 0), aparece con transición
+   suave cuando la grabación se activa. */
+.media-area__canvas-wrapper {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity var(--duration-slow) var(--ease-out);
+}
+
+/* Cuando está activo, el canvas se hace visible */
+.media-area--active .media-area__canvas-wrapper {
+  opacity: 1;
+}
+
+/* El canvas ocupa todo el espacio disponible del wrapper */
+#waveformCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Anillo de Pulso (Pulse Ring) ──
+   Círculo animado que se expande desde el centro del media area.
+   Indica visualmente que la grabación está en curso.
+   Invisible por defecto, se anima con keyframe pulseRing
+   cuando media-area tiene la clase --active. */
+.media-area__pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--color-accent-green);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.media-area--active .media-area__pulse {
+  animation: pulseRing 2s var(--ease-out) infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CONTROLS — Panel de Control Lateral
+   
+   Columna vertical con gap generoso entre elementos.
+   Contiene: indicador de estado, descripción, botones y lectura Hz.
+   ══════════════════════════════════════════════════════════════════ */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ── Header del panel de controles ──
+   Indicador de estado: punto de color + texto */
+.controls__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Punto de estado — 10x10px, gris por defecto.
+   Se vuelve verde con glow cuando está activo. */
+.controls__status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  transition: background var(--duration-normal) var(--ease-out),
+              box-shadow var(--duration-normal) var(--ease-out);
+}
+
+/* Estado activo: verde brillante con sombra luminosa y parpadeo */
+.controls__status-dot--active {
+  background: var(--color-accent-green);
+  box-shadow: 0 0 8px var(--color-accent-green);
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+/* Texto de estado — uppercase, Montserrat, gris por defecto */
+.controls__status-text {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Texto de estado activo — cambia a verde */
+.controls__status-text--active {
+  color: var(--color-accent-green);
+}
+
+/* ── Descripción del panel ──
+   Párrafo explicativo con instrucciones para el usuario. */
+.controls__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.7;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   HZ READOUT — Lectura de Frecuencia Fundamental
+   
+   Panel con fondo secundario (crema más oscuro) y sombra inset
+   que simula un display empotrado. Muestra el valor de Hz en
+   tiempo real con tamaño grande (3xl = 36px).
+   ══════════════════════════════════════════════════════════════════ */
+.hz-readout {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-inset);
+  text-align: center;
+}
+
+/* Label superior — "Frecuencia Fundamental (F₀)" */
+.hz-readout__label {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-xs);
+}
+
+/* Valor numérico de Hz — grande, azul, bold */
+.hz-readout__value {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  font-weight: 800;
+  color: var(--color-accent-blue);
+  letter-spacing: -0.03em;
+  transition: color var(--duration-normal) var(--ease-out);
+}
+
+/* Unidad "Hz" — más pequeña y gris para no competir con el número */
+.hz-readout__value span {
+  font-size: var(--font-size-lg);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}

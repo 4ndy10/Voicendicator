@@ -1,0 +1,132 @@
+/* ================================================================
+   MÓDULO: header.css — Estilos del Encabezado Principal
+   
+   El header contiene:
+   - Badge "Voicendicator" con ícono de micrófono
+   - Título principal con gradiente de texto
+   - Subtítulo descriptivo
+   - Línea decorativa inferior (::after) con gradiente verde→azul
+   
+   Todos los elementos tienen animación de entrada (fadeInDown)
+   escalonada (0s, 0.1s, 0.2s) para un efecto de cascada visual.
+   
+   DEPENDENCIAS: variables.css, animations.css
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   HEADER — Contenedor principal del encabezado
+   
+   Centrado con padding vertical generoso.
+   La línea decorativa ::after se posiciona absolutamente en la parte
+   inferior para separar visualmente el header del contenido.
+   ══════════════════════════════════════════════════════════════════ */
+.header {
+  padding: var(--space-2xl) 0 var(--space-xl);
+  text-align: center;
+  position: relative;
+}
+
+/* Línea decorativa inferior — gradiente verde a azul
+   120px de ancho, 3px de alto, centrada horizontalmente.
+   Actúa como separador visual elegante entre header y contenido. */
+.header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-accent-green), var(--color-accent-blue));
+  border-radius: var(--radius-full);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOGO WRAPPER — Contenedor del logotipo Voicendicator
+   
+   Centra el logo horizontalmente con margen inferior para separar
+   del título. Animación de entrada fadeInDown como primer elemento.
+   ══════════════════════════════════════════════════════════════════ */
+.header__logo-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+  animation: fadeInDown 0.6s var(--ease-out) both;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   LOGO IMAGE — Logotipo principal de la aplicación
+   
+   Tamaño generoso (320px) para capturar correctamente los detalles
+   internos del diseño (el radar circular verde-azul y la tipografía).
+   Drop-shadow sutil para darle profundidad sobre el fondo.
+   Hover con escala suave para interactividad visual.
+   ══════════════════════════════════════════════════════════════════ */
+.header__logo {
+  width: clamp(240px, 30vw, 380px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 24px rgba(27, 125, 24, 0.15))
+          drop-shadow(0 2px 8px rgba(9, 36, 156, 0.10));
+  transition: transform var(--duration-normal) var(--ease-out),
+              filter var(--duration-normal) var(--ease-out);
+  border-radius: var(--radius-lg);
+}
+
+/* Hover: escala sutil + sombra más pronunciada */
+.header__logo:hover {
+  transform: scale(1.03);
+  filter: drop-shadow(0 8px 32px rgba(27, 125, 24, 0.25))
+          drop-shadow(0 4px 12px rgba(9, 36, 156, 0.15));
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   TÍTULO PRINCIPAL — Texto con gradiente en el span
+   
+   Usa clamp() para un tamaño fluido entre 2xl (30px) y 4xl (44px).
+   El color base es azul oscuro para máximo contraste.
+   
+   El <span> dentro del h1 tiene un gradiente de texto (azul→verde)
+   usando background-clip: text + text-fill-color: transparent.
+   Este efecto solo funciona en el texto inline del span.
+   
+   Animación: fadeInDown con delay 0.1s (segundo en aparecer).
+   ══════════════════════════════════════════════════════════════════ */
+.header__title {
+  font-size: clamp(var(--font-size-2xl), 4vw, var(--font-size-4xl));
+  color: var(--color-accent-blue);
+  margin-bottom: var(--space-md);
+  animation: fadeInDown 0.6s var(--ease-out) 0.1s both;
+}
+
+/* Gradiente de texto en la segunda línea del título.
+   background-clip: text recorta el gradiente a la forma del texto.
+   -webkit-text-fill-color: transparent hace el texto invisible
+   para que se vea el gradiente de fondo. */
+.header__title span {
+  background: linear-gradient(135deg, var(--color-accent-blue) 0%, var(--color-accent-green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   SUBTÍTULO — Descripción corta debajo del título
+   
+   Usa Montserrat (heading font) pero con peso 500 (medium)
+   para diferenciarse del título pero mantener coherencia.
+   Max-width 600px para que no se extienda demasiado en pantallas
+   anchas (mejora legibilidad).
+   
+   Animación: fadeInDown con delay 0.2s (tercero en aparecer).
+   ══════════════════════════════════════════════════════════════════ */
+.header__subtitle {
+  font-family: var(--font-heading);
+  font-size: clamp(var(--font-size-base), 2vw, var(--font-size-lg));
+  color: var(--color-accent-green);
+  font-weight: 500;
+  max-width: 600px;
+  margin: 0 auto;
+  animation: fadeInDown 0.6s var(--ease-out) 0.2s both;
+}

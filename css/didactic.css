@@ -1,0 +1,124 @@
+/* ================================================================
+   MÓDULO: didactic.css — Sección Educativa "¿Sabías que...?"
+   
+   Card informativa que explica al usuario por qué escucha
+   su propia voz diferente a como la perciben los demás.
+   Incluye una barra decorativa superior con gradiente animado
+   (shimmerGradient) para atraer la atención.
+   
+   Contenido:
+   - Ícono de pregunta (?) en wrapper redondeado
+   - Título "¿Sabías que...?"
+   - Texto explicativo con términos destacados
+   - Fórmula F₀ con estilo de badge/chip
+   
+   DEPENDENCIAS: variables.css, animations.css
+   ================================================================ */
+
+/* ══════════════════════════════════════════════════════════════════
+   DIDACTIC — Sección contenedora
+   
+   Animación fadeInUp con delay 0.5s (última sección en aparecer).
+   ══════════════════════════════════════════════════════════════════ */
+.didactic {
+  margin: var(--space-3xl) 0;
+  animation: fadeInUp 0.7s var(--ease-out) 0.5s both;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CARD DIDÁCTICA — Contenedor principal
+   
+   Fondo crema secundario para diferenciarse del fondo general.
+   Border radius grande (xl = 24px) y sombra neumórfica suave.
+   overflow: hidden necesario para contener el pseudo-elemento
+   ::before (barra decorativa).
+   ══════════════════════════════════════════════════════════════════ */
+.didactic__card {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl) var(--space-2xl);
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Barra decorativa superior — gradiente animado verde↔azul
+   Se extiende a lo ancho de toda la card (position absolute).
+   La animación shimmerGradient desplaza el gradiente horizontalmente
+   para crear un efecto de brillo continuo (4s loop). */
+.didactic__card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--color-accent-green), var(--color-accent-blue), var(--color-accent-green));
+  background-size: 200% 100%;
+  animation: shimmerGradient 4s linear infinite;
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   ÍCONO WRAPPER — Contenedor del ícono de pregunta
+   
+   Cuadrado redondeado 56x56px con fondo verde sutil.
+   El ícono SVG interno es verde y 28x28px.
+   ══════════════════════════════════════════════════════════════════ */
+.didactic__icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-accent-green-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-lg);
+}
+
+.didactic__icon-wrapper svg {
+  width: 28px;
+  height: 28px;
+  color: var(--color-accent-green);
+}
+
+/* ══════════════════════════════════════════════════════════════════
+   CONTENIDO TEXTUAL
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Título — verde, tamaño xl */
+.didactic__title {
+  font-size: var(--font-size-xl);
+  color: var(--color-accent-green);
+  margin-bottom: var(--space-md);
+}
+
+/* Texto explicativo — azul, line-height amplio para lectura cómoda */
+.didactic__text {
+  font-size: var(--font-size-base);
+  color: var(--color-accent-blue);
+  line-height: 1.8;
+}
+
+/* Palabras enfatizadas (<em>) — verde bold itálica
+   Destaca términos científicos como "conducción ósea" */
+.didactic__text em {
+  font-style: italic;
+  color: var(--color-accent-green);
+  font-weight: 600;
+}
+
+/* Fórmula F₀ — estilo de badge/chip inline
+   Fondo azul sutil, bordes redondeados, Montserrat itálica.
+   Se usa para la notación científica "F₀" dentro del texto. */
+.didactic__formula {
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-style: italic;
+  background: var(--color-accent-blue-subtle);
+  color: var(--color-accent-blue);
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  margin: 0 4px;
+}
